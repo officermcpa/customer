@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -273,6 +273,15 @@
             color: #9f7aea;
             font-weight: 600;
             background: rgba(159, 122, 234, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+         .customer-deductions-file {
+            font-size: 1.2rem;
+            color: #f56565;
+            font-weight: 600;
+            background: rgba(245, 101, 101, 0.1);
             padding: 0.5rem 1rem;
             border-radius: 20px;
             display: inline-block;
@@ -754,6 +763,7 @@
                 const possibleFileNumberFields = ['מספר תיק', 'מס תיק', 'file_number', 'case_number', 'תיק מספר'];
                 const possibleAreaFields = ['איזור', 'אזור', 'area', 'region', 'מיקום'];
                 const possibleVatFileFields = ['מספר תיק מעמ', 'תיק מעמ', 'מספר תיק במעמ', 'vat_file', 'מעמ'];
+                const possibleDeductionsFileFields = ['תיק ניכויים', 'מספר תיק ניכויים', 'תיק נכויים', 'deductions_file', 'ניכויים'];
                 
                 let name = '';
                 let customerId = '';
@@ -762,6 +772,7 @@
                 let fileNumber = '';
                 let area = '';
                 let vatFileNumber = '';
+                let deductionsFileNumber = '';
 
                 // חיפוש שם
                 for (let field of possibleNameFields) {
@@ -802,7 +813,14 @@
                         break;
                     }
                 }
-
+                // חיפוש מספר תיק ניכויים
+                for (let field of possibleDeductionsFileFields) {
+                    if (row[field]) {
+                        deductionsFileNumber = row[field];
+                        break;
+                    }
+                }
+                
                 // חיפוש מספר תיק במע"מ
                 for (let field of possibleVatFileFields) {
                     if (row[field]) {
@@ -834,8 +852,9 @@
                     fileNumber: fileNumber ? String(fileNumber) : '',
                     area: area ? String(area) : '',
                     vatFileNumber: vatFileNumber ? String(vatFileNumber) : '',
+                    deductionsFileNumber: deductionsFileNumber ? String(deductionsFileNumber) : '',
                     originalData: row
-                };
+                        };
             });
         }
 
@@ -874,6 +893,7 @@
                 customer.name.toLowerCase().includes(query.toLowerCase()) ||
                 customer.id.toLowerCase().includes(query.toLowerCase()) ||
                 customer.vatFileNumber.toLowerCase().includes(query.toLowerCase()) ||
+                customer.deductionsFileNumber.toLowerCase().includes(query.toLowerCase()) ||
                 customer.partner.toLowerCase().includes(query.toLowerCase()) ||
                 customer.caseType.toLowerCase().includes(query.toLowerCase()) ||
                 customer.fileNumber.toLowerCase().includes(query.toLowerCase()) ||
@@ -891,13 +911,14 @@
             }
 
             const resultsHTML = results.map(customer => `
-                <div class="customer-result" onclick="selectCustomer('${customer.name}', '${customer.id}', '${customer.partner}', '${customer.caseType}', '${customer.fileNumber}', '${customer.area}')">
+                <div class="customer-result" onclick="selectCustomer('${customer.name}', '${customer.id}', '${customer.partner}', '${customer.caseType}', '${customer.fileNumber}', '${customer.area}', '${customer.vatFileNumber}', '${customer.deductionsFileNumber}')">
                     <div class="customer-info">
                         <div class="customer-name">${highlightText(customer.name, query)}</div>
                         <div class="customer-details">
                             <div class="customer-id">מספר לקוח: ${highlightText(customer.id, query)}</div>
                             ${customer.fileNumber ? `<div class="customer-file-number">📂 מספר תיק: ${highlightText(customer.fileNumber, query)}</div>` : ''}
                             ${customer.vatFileNumber ? `<div class="customer-vat-file">💰 תיק מע"מ: ${highlightText(customer.vatFileNumber, query)}</div>` : ''} 
+                            ${customer.deductionsFileNumber ? `<div class="customer-deductions-file">🧾 תיק ניכויים: ${highlightText(customer.deductionsFileNumber, query)}</div>` : ''}
                             ${customer.area ? `<div class="customer-area">📍 איזור: ${highlightText(customer.area, query)}</div>` : ''}
                             ${customer.partner ? `<div class="customer-partner"><span class="partner-icon">👤</span>שותף: ${highlightText(customer.partner, query)}</div>` : ''}
                             ${customer.caseType ? `<div class="customer-case-type">📁 סוג: ${highlightText(customer.caseType, query)}</div>` : ''}
@@ -917,24 +938,28 @@
         }
 
         // בחירת לקוח
-        function selectCustomer(name, id, vatFileNumber, partner, caseType, fileNumber, area) {
-            let message = `נבחר לקוח: ${name}\nמספר לקוח: ${id}`;
-            if (fileNumber) {
+        function selectCustomer(name, id, partner, caseType, fileNumber, area, vatFileNumber, deductionsFileNumber) {
+                let message = `נבחר לקוח: ${name}\nמספר לקוח: ${id}`;
+                if (fileNumber) {
                 message += `\nמספר תיק: ${fileNumber}`;
-            }
-            if (vatFileNumber) {
+                }
+                if (vatFileNumber) {
                 message += `\nתיק מע"מ: ${vatFileNumber}`;
-            }
-            if (area) {
+                }
+                if (deductionsFileNumber) {
+                message += `\nתיק ניכויים: ${deductionsFileNumber}`;
+                }
+                if (area) {
                 message += `\nאיזור: ${area}`;
-            }
-            if (partner) {
+                }
+                if (partner) {
                 message += `\nשותף מטפל: ${partner}`;
-            }
-            if (caseType) {
+                }
+                if (caseType) {
                 message += `\nסוג תיק: ${caseType}`;
+                }
+                alert(message);
             }
-            alert(message);
             
             // כאן אפשר להוסיף פונקציונליות נוספת כמו:
             // - העתקה ללוח
